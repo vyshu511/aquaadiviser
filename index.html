@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water TDS Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 80%;
+            align-items: center;
+        }
+        .legend {
+            width: 25%;
+            text-align: left;
+            padding: 20px;
+        }
+        .legend h3 {
+            text-align: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .color-box {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .content {
+            width: 50%;
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+        select, input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-container {
+            margin-top: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .result {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            width: 80%;
+        }
+        .excellent { background-color: lightgreen; }
+        .good { background-color: lightyellow; }
+        .moderate { background-color: orange; }
+        .poor { background-color: lightcoral; }
+        .very-poor { background-color: red; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Side Color Legend -->
+        <div class="legend">
+            <h3>Water Quality Guide</h3>
+            <div class="legend-item"><div class="color-box excellent"></div> Excellent (≤50 ppm)</div>
+            <div class="legend-item"><div class="color-box good"></div> Good (51 - 150 ppm)</div>
+            <div class="legend-item"><div class="color-box moderate"></div> Moderate (151 - 300 ppm)</div>
+            <div class="legend-item"><div class="color-box poor"></div> Poor (301 - 500 ppm)</div>
+            <div class="legend-item"><div class="color-box very-poor"></div> Very Poor (>500 ppm)</div>
+        </div>
+
+        <!-- Middle TDS Checker -->
+        <div class="content">
+            <h2>Water TDS Checker</h2>
+            <label for="district">Select District of Andhra Pradesh: </label>
+            <select id="district">
+                <option value="">--Select--</option>
+                <option value="Visakhapatnam">Visakhapatnam</option>
+                <option value="Guntur">Guntur</option>
+                <option value="Nellore">Nellore</option>
+                <option value="Tirupati">Tirupati</option>
+                <option value="Kurnool">Kurnool</option>
+                <option value="Anantapur">Anantapur</option>
+                <option value="Kadapa">Kadapa</option>
+                <option value="Srikakulam">Srikakulam</option>
+                <option value="Prakasam">Prakasam</option>
+                <option value="East Godavari">East Godavari</option>
+                <option value="West Godavari">West Godavari</option>
+            </select>
+            <br><br>
+            <label for="tds">Enter TDS Value (ppm): </label>
+            <input type="number" id="tds" placeholder="e.g. 200">
+            <button onclick="checkWaterQuality()">Submit</button>
+            
+            <div class="result-container">
+                <div class="result" id="quality"></div>
+                <div class="result" id="purifier"></div>
+                <div class="result" id="use"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const districtWaterQuality = {
+            "Visakhapatnam": 250,
+            "Guntur": 200,
+            "Nellore": 300,
+            "Tirupati": 400,
+            "Kurnool": 450,
+            "Anantapur": 500,
+            "Kadapa": 600,
+            "Srikakulam": 320,
+            "Prakasam": 270,
+            "East Godavari": 350,
+            "West Godavari": 330
+        };
+        
+        function checkWaterQuality() {
+            let district = document.getElementById("district").value;
+            let tds = document.getElementById("tds").value || districtWaterQuality[district];
+            
+            if (!district) {
+                alert("Please select a district.");
+                return;
+            }
+            
+            if (!tds) {
+                alert("Please enter the TDS value.");
+                return;
+            }
+            
+            tds = parseInt(tds);
+            let quality = "";
+            let purifier = "";
+            let use = "";
+            let qualityClass = "";
+
+            if (tds <= 50) {
+                quality = "Excellent - No purification needed";
+                purifier = "Natural water, safe to drink";
+                use = "No purifier needed as water is already clean.";
+                qualityClass = "excellent";
+            } else if (tds > 50 && tds <= 150) {
+                quality = "Good - Minor impurities present";
+                purifier = "UV Purifier recommended";
+                use = "UV purifiers help remove bacteria and viruses, ensuring safe drinking water.";
+                qualityClass = "good";
+            } else if (tds > 150 && tds <= 300) {
+                quality = "Moderate - Some impurities present";
+                purifier = "UV + UF Purifier recommended";
+                use = "UV kills bacteria, while UF removes suspended solids and impurities.";
+                qualityClass = "moderate";
+            } else if (tds > 300 && tds <= 500) {
+                quality = "Poor - High impurity levels";
+                purifier = "RO + UV Purifier recommended";
+                use = "RO removes dissolved solids and heavy metals, while UV kills harmful microorganisms.";
+                qualityClass = "poor";
+            } else {
+                quality = "Very Poor - Unsafe for drinking";
+                purifier = "RO + UV + UF Purifier strongly recommended";
+                use = "RO removes heavy metals and dissolved impurities, UV kills germs, and UF provides additional filtration.";
+                qualityClass = "very-poor";
+            }
+            
+            document.getElementById("quality").innerText = "Water Quality: " + quality;
+            document.getElementById("purifier").innerText = "Suggested Purifier: " + purifier;
+            document.getElementById("use").innerText = "Use of Purifier: " + use;
+
+            document.getElementById("quality").className = "result " + qualityClass;
+            document.getElementById("purifier").className = "result";
+            document.getElementById("use").className = "result";
+
+            document.querySelector('.result-container').style.display = "flex";
+        }
+    </script>
+</body>
+</html>
